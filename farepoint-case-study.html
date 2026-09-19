@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FarePoint - Airline Fare &amp; Ancillary Pricing Optimization</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+
+/* ===== Responsive view toggle (desktop <-> mobile) ===== */
+.mob-view { display: none; }
+@media (max-width: 767px) {
+  .desktop-view { display: none !important; }
+  .mob-view { display: block; }
+}
+
+:root {
+  --primary: #1c1c1c;
+  --secondary: #383838;
+  --muted: #757575;
+  --bg: #f8f8f8;
+  --green: #43c78b;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+.mob-view { font-family: "Asta Sans", sans-serif; color: var(--secondary); font-weight: 400; -webkit-font-smoothing: antialiased; background: var(--bg); }
+.mob-view img { max-width: 100%; display: block; }
+.mob-view a { text-decoration: none; color: inherit; }
+.mob-view h1, .mob-view h2, .mob-view h3 { font-family: "Asta Sans", sans-serif; }
+
+.mob-nav {
+  display: flex; align-items: center; gap: 16px; padding: 14px 20px; background: var(--bg);
+  position: sticky; top: 0; z-index: 1000; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+}
+.mob-nav::-webkit-scrollbar { display: none; }
+.mob-nav img.mob-avatar { width: 32px; height: 32px; border-radius: 999px; flex-shrink: 0; object-fit: cover; }
+.mob-nav a.mob-link { font-weight: 600; font-size: 14px; color: var(--secondary); white-space: nowrap; flex-shrink: 0; }
+.mob-nav img.mob-li-icon { width: 18px; height: 18px; flex-shrink: 0; }
+
+.mob-hero { padding: 28px 20px 24px; }
+.mob-hero .mob-kicker { font-size: 14px; color: var(--secondary); margin: 0 0 12px; }
+.mob-hero h1 { font-size: 28px; line-height: 1.2; color: var(--primary); font-weight: 400; margin: 0 0 16px; letter-spacing: -0.01em; }
+.mob-hero p.mob-desc { font-size: 15px; line-height: 1.5; color: var(--secondary); margin: 0; }
+
+.mob-chips-scroll {
+  display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  padding: 0 20px 24px; cursor: grab;
+}
+.mob-chips-scroll::-webkit-scrollbar { display: none; }
+.mob-method-chip {
+  flex-shrink: 0; background: #eaeaea; color: var(--secondary); font-size: 13px; padding: 6px 10px; border-radius: 2px; white-space: nowrap;
+}
+
+.mob-kpis { padding: 20px 20px 28px; border-top: 1px dashed #d9d9d9; margin: 0 20px 0; display: flex; flex-direction: column; gap: 16px; }
+.mob-kpi { }
+.mob-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; }
+.mob-eyebrow.mob-green { color: var(--green); }
+.mob-kpi-value { font-size: 16px; font-weight: 600; color: var(--primary); margin: 0; line-height: 1.3; }
+
+.mob-section { padding: 28px 20px; border-top: 1px solid #e5e5e5; }
+.mob-section h2 { font-size: 24px; color: var(--primary); font-weight: 400; margin: 0 0 16px; line-height: 1.25; }
+.mob-section p.mob-desc { font-size: 14px; line-height: 1.55; color: var(--secondary); margin: 0 0 14px; }
+
+.mob-baxbox { background: #fff; border-radius: 4px; padding: 16px; margin-bottom: 12px; }
+.mob-baxitem { font-size: 14px; color: var(--secondary); margin: 0 0 10px; padding-bottom: 10px; border-bottom: 1px dashed #e5e5e5; }
+.mob-baxitem:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+.mob-persona { background: #fff; border-radius: 4px; padding: 16px; margin-bottom: 12px; }
+.mob-persona-head { display: flex; align-items: center; gap: 12px; }
+.mob-persona-avatar { width: 36px; height: 36px; border-radius: 999px; background: var(--primary); color: #fff; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.mob-persona-name { font-size: 16px; font-weight: 600; color: var(--primary); margin: 0; }
+.mob-persona-role { font-size: 12px; color: var(--muted); margin: 0; }
+
+.mob-shot { width: 100%; border-radius: 4px; overflow: hidden; margin: 16px 0 8px; }
+.mob-shot img { width: 100%; height: auto; }
+.mob-caption { font-size: 13px; color: var(--muted); margin: 0; }
+
+.mob-callout { background: #fff; border-radius: 4px; padding: 16px; margin-top: 20px; }
+
+.mob-chip-row { padding: 24px 20px 0; }
+.mob-chip { display: inline-block; background: #1e1e1e; color: #f3f3f3; font-size: 14px; padding: 6px 10px; border-radius: 2px; }
+
+.mob-flow-step { padding: 28px 20px; border-top: 1px solid #e5e5e5; }
+.mob-flow-step h3 { font-size: 20px; color: var(--primary); font-weight: 600; margin: 4px 0 12px; line-height: 1.3; }
+
+.mob-bars { margin-top: 20px; display: flex; flex-direction: column; gap: 16px; }
+.mob-bar-row { display: flex; align-items: center; gap: 12px; }
+.mob-bar-row span { font-size: 14px; color: var(--secondary); width: 84px; flex-shrink: 0; }
+.mob-bar-track { flex: 1; height: 6px; background: #e5e5e5; border-radius: 999px; overflow: hidden; }
+.mob-bar-fill { height: 100%; background: var(--green); border-radius: 999px; }
+
+.mob-stat { background: #fff; border-radius: 4px; padding: 20px; margin-bottom: 12px; }
+.mob-stat-num { font-size: 40px; font-weight: 600; color: var(--green); margin: 0 0 8px; font-family: "Asta Sans", sans-serif; }
+.mob-stat-desc { font-size: 15px; line-height: 1.4; color: var(--secondary); margin: 0; }
+.mob-stat-desc b { font-weight: 600; }
+
+.mob-point { padding-top: 20px; margin-top: 12px; border-top: 1px solid #e5e5e5; }
+.mob-point h3 { font-size: 17px; color: var(--primary); font-weight: 600; margin: 4px 0 8px; }
+.mob-point .mob-desc { font-size: 14px; line-height: 1.5; color: var(--secondary); margin: 0; }
+
+.mob-closing { padding: 32px 20px 56px; border-top: 1px solid var(--primary); text-align: center; }
+.mob-back { font-size: 14px; color: var(--muted); }
+.mob-closing p { font-size: 14px; color: var(--secondary); }
+.mob-mail { font-weight: 600; color: var(--primary); }
+
+    </style>
+  </head>
+  <body data-page="farepoint">
+    <div class="desktop-view">
+      <div id="root"></div>
+    </div>
+    <div class="mob-view">
+<nav class="mob-nav" aria-label="Main">
+  <img class="mob-avatar" src="assets/mobile/profile-photo.png" alt="Mihai Tocitu" />
+  <a class="mob-link" href="index.html">Hi</a>
+  <a class="mob-link" href="index.html?section=work">Work</a>
+  <a class="mob-link" href="index.html?section=about">About</a>
+  <a href="https://www.linkedin.com/in/mihaitocitu/" target="_blank" rel="noopener noreferrer" style="margin-left:auto; flex-shrink:0; display:flex;">
+    <img class="mob-li-icon" src="assets/mobile/linkedin-icon.png" alt="LinkedIn" />
+  </a>
+</nav>
+
+<header class="mob-hero">
+  <p class="mob-kicker">FarePoint - airline branded fare and ancillary pricing optimization</p>
+  <h1>I gave pricing analysts the confidence to move off a conservative default.</h1>
+  <p class="mob-desc">Replacing reactive, conservative, spreadsheet-based fare pricing with a proactive, AI-driven workflow - one that turns a model's output into a curve an analyst can question, test, and stand behind. This case study covers use case one: branded fare pricing.</p>
+</header>
+
+<div class="mob-chips-scroll" id="mob-chipsScroll">
+  <span class="mob-method-chip">Interviews</span>
+  <span class="mob-method-chip">Workshops</span>
+  <span class="mob-method-chip">User stories</span>
+  <span class="mob-method-chip">Wireframes</span>
+  <span class="mob-method-chip">Prototypes</span>
+  <span class="mob-method-chip">High-fidelity</span>
+  <span class="mob-method-chip">User testing</span>
+  <span class="mob-method-chip">Design QA</span>
+</div>
+
+<section class="mob-kpis">
+  <div class="mob-kpi">
+    <p class="mob-eyebrow">WORKFLOW</p>
+    <p class="mob-kpi-value">AI identifies &rarr; Analyst proposes &rarr; Manager approves</p>
+  </div>
+  <div class="mob-kpi">
+    <p class="mob-eyebrow">CORE INTERACTION</p>
+    <p class="mob-kpi-value">Willingness-to-pay curve</p>
+  </div>
+  <div class="mob-kpi">
+    <p class="mob-eyebrow">MY ROLE</p>
+    <p class="mob-kpi-value">Product design, end to end</p>
+  </div>
+</section>
+
+<section class="mob-section">
+  <h2>What problem does it solve?</h2>
+  <p class="mob-desc">Before FarePoint, branded-fare pricing ran entirely through spreadsheets. A revision and its approval together took weeks - long enough that by the time a price change went live, the demand shift that justified it had often already passed. The team wasn't just slow to react; it usually missed the window to act at all, and every missed window meant a fare stuck at a price nobody had actually chosen.</p>
+  <p class="mob-desc">That slowness had a second, quieter cost: because nobody could see what a bolder price would actually risk or earn, prices stayed conservative by default. There was no tool that made the trade-off between risk and revenue visible, so the safe number always won - even when the data said a bolder one would pay off.</p>
+
+  <div class="mob-baxbox">
+    <p class="mob-eyebrow">BEFORE</p>
+    <p class="mob-baxitem">Pricing lived in exported spreadsheets</p>
+    <p class="mob-baxitem">Revision &rarr; approval: weeks</p>
+    <p class="mob-baxitem">Reactive, and still usually too late</p>
+    <p class="mob-baxitem">No visible risk/reward trade-off</p>
+    <p class="mob-baxitem">Prices defaulted to conservative</p>
+  </div>
+  <div class="mob-baxbox">
+    <p class="mob-eyebrow">AFTER</p>
+    <p class="mob-baxitem">One shared pricing interface</p>
+    <p class="mob-baxitem">Revision &rarr; approval: minutes</p>
+    <p class="mob-baxitem">Proactive - opportunities surfaced daily</p>
+    <p class="mob-baxitem">Revenue/conversion impact per price point</p>
+    <p class="mob-baxitem">Prices reflect actual, visible confidence</p>
+  </div>
+
+  <p class="mob-desc" style="margin-top:20px;">Interviews and workflow-mapping sessions with two roles - the analyst who proposes, the manager who approves - set the frame for everything that follows.</p>
+</section>
+
+<section class="mob-section">
+  <h2>Users</h2>
+  <p class="mob-desc">Everything downstream was designed around two people passing the same decision back and forth - the analyst who proposes, the manager who approves. Their incentives don't always line up: analysts are pushed to find revenue upside, managers are accountable if a bolder price backfires. The interface had to hold both jobs credible at once, so neither role could treat the other's screen as a black box.</p>
+  <p class="mob-desc">That handoff shows up everywhere in the design - a proposal has to carry enough context that a manager can approve it without a follow-up conversation, and a rejection has to explain itself well enough that the analyst doesn't just resubmit the same number.</p>
+
+  <div class="mob-persona">
+    <div class="mob-persona-head">
+      <span class="mob-persona-avatar">JA</span>
+      <div>
+        <p class="mob-persona-name">Jane</p>
+        <p class="mob-persona-role">ANALYST</p>
+      </div>
+    </div>
+    <p class="mob-eyebrow" style="margin-top:12px;">GOALS</p>
+    <p class="mob-baxitem">Identify opportunities</p>
+    <p class="mob-baxitem">Reprice based on AI suggestions</p>
+    <p class="mob-baxitem">Manually reprice clusters if needed</p>
+    <p class="mob-baxitem">Propose new prices</p>
+  </div>
+  <div class="mob-persona">
+    <div class="mob-persona-head">
+      <span class="mob-persona-avatar">EM</span>
+      <div>
+        <p class="mob-persona-name">Emma</p>
+        <p class="mob-persona-role">MANAGER</p>
+      </div>
+    </div>
+    <p class="mob-eyebrow" style="margin-top:12px;">GOALS</p>
+    <p class="mob-baxitem">Review and file analyst proposals</p>
+    <p class="mob-baxitem">Monitor the performance of filed clusters</p>
+    <p class="mob-baxitem">Manually reprice clusters if needed</p>
+  </div>
+</section>
+
+<section class="mob-section">
+  <h2>A shared vocabulary, built to scale</h2>
+  <p class="mob-desc">Every price in the product is one of three states - current, AI-optimal, or custom override - rendered in the same colour everywhere, so reading a price never means re-learning what a colour means on a new screen.</p>
+  <p class="mob-desc">Airlines don't share a pricing philosophy, and portfolios range from a few hundred OD pairs to several thousand. Getting a single component to hold up across that range meant going deep on airfare pricing itself first - fare-family transitions, RBD structures, bound governance - so every pattern stayed legible from one override to a 235-cluster table.</p>
+  <div class="mob-shot"><img src="assets/mobile/price-state-diagram.png" alt="Price state color system diagram" /></div>
+  <div class="mob-callout">
+    <p class="mob-eyebrow">WORKING PRINCIPLE</p>
+    <p class="mob-desc" style="margin:0;">Transparency and confidence only earn trust when they're paired with resilience and agency. A system that explains its reasoning but won't let someone push back isn't trustworthy - it's just persuasive. Every confidence signal in this product has a matching override, somewhere close by.</p>
+  </div>
+</section>
+
+<div class="mob-chip-row">
+  <span class="mob-chip">Here's how the flow actually works:</span>
+</div>
+
+<section class="mob-section">
+  <h2>Following the flow</h2>
+</section>
+
+<article class="mob-flow-step">
+  <p class="mob-eyebrow mob-green">01. PRIORITIZE</p>
+  <h3>Identifying and prioritizing opportunities</h3>
+  <p class="mob-desc">The analyst's day starts on one ranked list, not a spreadsheet export: clusters the model has flagged, split into Out-of-Bounds, Within-Bounds, Proposals, and Monitoring - each independently toggled on or off. A confidence arrow sits next to every number, so priority reads at a glance instead of requiring a scan of raw figures.</p>
+  <div class="mob-shot"><img src="assets/mobile/shot-prioritize.png" alt="AI Opportunities dashboard" /></div>
+  <p class="mob-caption">AI Opportunities - ranked, filterable, and toggled by state</p>
+</article>
+
+<article class="mob-flow-step">
+  <p class="mob-eyebrow mob-green">02. PRICE</p>
+  <h3>Pricing the opportunities</h3>
+  <p class="mob-desc">A cluster opens into a pricing table organized by cabin and tier - collapsed rows show the model's recommended CURR / WB / OOB values at a glance, before anyone commits to going deeper.</p>
+  <div class="mob-shot"><img src="assets/mobile/shot-price.png" alt="Cluster pricing table" /></div>
+  <p class="mob-caption">Cluster Pricing - tiers collapsed, recommended values visible</p>
+  <p class="mob-desc" style="margin-top:16px;">Expanding a tier turns that recommendation into a willingness-to-pay curve: the same distribution that arrives from the model as raw output becomes colour-coded, clickable price points, each one carrying its own confidence and predicted revenue impact.</p>
+  <p class="mob-desc">Selecting a point returns that estimate on the spot. Setting a custom price is a fully supported state on the same curve, not a workaround around it - the screenshot below shows both a model-recommended OOB point and an analyst's custom point, side by side, each with its own brand-share read.</p>
+  <div class="mob-shot"><img src="assets/mobile/shot-wtp-curve.png" alt="Willingness-to-pay curve" /></div>
+  <p class="mob-caption">Same curve, two transitions - one still on the model's OOB point, one moved to a custom price</p>
+  <p class="mob-desc" style="margin-top:16px;">Every price point carries the same confidence tooltip, whatever level you're looking at it from - a whole cabin, a single transition, or one exact point on the curve. Hovering it surfaces the reasoning: how many historical fare changes the model is drawing on, whether the window is peak or off-peak season, and the resulting uncertainty band. "High confidence" is never something an analyst has to take on faith.</p>
+  <div class="mob-shot"><img src="assets/confidence-tooltip.png" alt="Confidence tooltip" /></div>
+</article>
+
+<article class="mob-flow-step">
+  <p class="mob-eyebrow mob-green">03. HUMAN AGENCY</p>
+  <h3>Full control - exceptions and manual pricing</h3>
+  <p class="mob-desc">Not every decision has to run through the model. The same control extends to fully manual pricing - down to a single OD pair inside a cluster, or across the whole portfolio from an all-clusters view - for the moments an advanced user disagrees with the AI outright. It's the resilience half of the transparency principle from earlier: a tool people can override without a fight is one they'll actually trust.</p>
+  <div class="mob-shot"><img src="assets/mobile/shot-manual-exception.png" alt="Manual pricing exception" /></div>
+  <p class="mob-caption">One exception, inside an otherwise AI-priced cluster</p>
+  <div class="mob-shot" style="margin-top:16px;"><img src="assets/mobile/shot-all-clusters.png" alt="All clusters manual pricing" /></div>
+  <p class="mob-caption">All Clusters - manual pricing at full-portfolio scale, 235 clusters and counting</p>
+</article>
+
+<article class="mob-flow-step">
+  <p class="mob-eyebrow mob-green">04. GOVERNANCE</p>
+  <h3>Control over bounds and user permissions</h3>
+  <p class="mob-desc">Above the individual cluster, Business Rules lets a manager set min/max bounds and automation toggles once for the whole portfolio, so guardrails don't get re-argued proposal by proposal. Role-based permissions sit alongside - who can propose, who can approve, who can touch bounds at all - so governance isn't just about the prices, it's about who's allowed to move them.</p>
+  <div class="mob-shot"><img src="assets/mobile/shot-governance.png" alt="Business rules governance" /></div>
+  <p class="mob-caption">Business Rules - bounds and automation, set once for the portfolio</p>
+</article>
+
+<article class="mob-flow-step">
+  <p class="mob-eyebrow mob-green">05. TESTING</p>
+  <h3>Testing the direction before committing to it</h3>
+  <p class="mob-desc">Every price point carries the same confidence tooltip, whatever level you're looking at it from - a whole cabin, a single transition, or one exact point on the curve. Hovering it surfaces the reasoning: how many historical fare changes the model is drawing on, whether the window is peak or off-peak season, and the resulting uncertainty band. "High confidence" is never something an analyst has to take on faith.</p>
+  <div class="mob-bars">
+    <div class="mob-bar-row"><span>Analysts</span><div class="mob-bar-track"><div class="mob-bar-fill" style="width:82%;"></div></div></div>
+    <div class="mob-bar-row"><span>Managers</span><div class="mob-bar-track"><div class="mob-bar-fill" style="width:90%;"></div></div></div>
+    <div class="mob-bar-row"><span>Leadership</span><div class="mob-bar-track"><div class="mob-bar-fill" style="width:86%;"></div></div></div>
+  </div>
+</article>
+
+<section class="mob-section">
+  <p class="mob-eyebrow mob-green">06. OUTCOME</p>
+  <h2>What moved, and what it proved</h2>
+  <p class="mob-desc">Figures below are from one airline partner's rollout of the branded-fare module - the first client to move off spreadsheets onto FarePoint.</p>
+  <p class="mob-desc">Numbers explain what changed. Workshops with analysts, once the curve had been live for a while, explained why - and surfaced patterns neither the research nor the model had predicted.</p>
+
+  <div class="mob-stat">
+    <p class="mob-stat-num">+7%</p>
+    <p class="mob-stat-desc"><b>buy-across revenue</b> from branded-fare repricing</p>
+  </div>
+  <div class="mob-stat">
+    <p class="mob-stat-num">-90%</p>
+    <p class="mob-stat-desc"><b>time from repricing decision to live</b>, versus the spreadsheet process</p>
+  </div>
+  <div class="mob-stat">
+    <p class="mob-stat-num">100%</p>
+    <p class="mob-stat-desc"><b>analyst adoption</b> - the spreadsheet workflow was fully retired</p>
+  </div>
+
+  <div class="mob-point">
+    <p class="mob-eyebrow mob-green">01</p>
+    <h3>Exploration became deliberate</h3>
+    <p class="mob-desc">Analysts started testing multiple points on the curve before committing, rather than accepting the first number shown - the curve turned a one-shot decision into a short, visible negotiation with the model.</p>
+  </div>
+  <div class="mob-point">
+    <p class="mob-eyebrow mob-green">02</p>
+    <h3>Risk tolerance rose, measurably</h3>
+    <p class="mob-desc">With the trade-off quantified instead of assumed, analysts filed more out-of-bounds proposals than within-bounds ones - the opposite of the conservative default the old process produced.</p>
+  </div>
+  <div class="mob-point">
+    <p class="mob-eyebrow mob-green">03</p>
+    <h3>Strategic underpricing, on purpose</h3>
+    <p class="mob-desc">The most interesting pattern was a minority one: analysts sometimes chose to deliberately under-price a branded fare family to stay competitive against a rival's fare on the same route - a call the model would never make on its own, but one the interface let them make with full information instead of instinct.</p>
+  </div>
+</section>
+
+<div class="mob-closing">
+  <a href="index.html" class="mob-back">&larr; Back to showcase</a>
+  <p style="margin-top:20px;">Curious how AI turned reactive fare pricing into a revenue driver? <a class="mob-mail" href="mailto:mihai.tocitu@gmail.com">Let's talk UX!</a></p>
+</div>
+
+    </div>
+    <script type="module" src="app.js"></script>
+
+<script>
+(function(){
+  var el = document.getElementById('mob-chipsScroll');
+  if (!el) return;
+  var isDown = false, startX = 0, startScroll = 0, moved = false;
+  el.addEventListener('pointerdown', function(e){
+    isDown = true; moved = false;
+    startX = e.clientX;
+    startScroll = el.scrollLeft;
+    el.setPointerCapture(e.pointerId);
+    el.style.cursor = 'grabbing';
+  });
+  el.addEventListener('pointermove', function(e){
+    if (!isDown) return;
+    var dx = e.clientX - startX;
+    if (Math.abs(dx) > 3) moved = true;
+    el.scrollLeft = startScroll - dx;
+  });
+  function end(e){ isDown = false; el.style.cursor = 'grab'; }
+  el.addEventListener('pointerup', end);
+  el.addEventListener('pointerleave', end);
+  el.addEventListener('pointercancel', end);
+  el.addEventListener('click', function(e){ if (moved) { e.preventDefault(); e.stopPropagation(); } }, true);
+})();
+</script>
+
+  </body>
+</html>
